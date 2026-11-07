@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Kronos upstream repo & downloaded assets
+Kronos/
+*.deb
+*.log
+
+# PyTorch & HuggingFace caches
+.cache/
+checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
