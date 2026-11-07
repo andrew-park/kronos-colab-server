@@ -655,6 +655,21 @@
 
         function initDashboard() {
             try {
+                // 1. URL Query Parameter 파싱 (?url=..., ?api=..., ?server=..., ?endpoint=...)
+                const urlParams = new URLSearchParams(window.location.search);
+                const queryApi = urlParams.get('url') || urlParams.get('api') || urlParams.get('server') || urlParams.get('endpoint');
+                const autoRun = urlParams.get('autorun') !== 'false'; // autorun 기본 true (query param 제공 시)
+
+                const endpointInput = document.getElementById('api-endpoint');
+                if (queryApi && endpointInput) {
+                    let formattedUrl = queryApi.trim();
+                    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+                        formattedUrl = 'https://' + formattedUrl;
+                    }
+                    endpointInput.value = formattedUrl;
+                }
+
+                // 2. 기본 캐시 데이터 파싱 및 초기 렌더링
                 const cachedEl = document.getElementById('cached-data');
                 if (!cachedEl) {
                     console.error('cached-data 엘리먼트를 찾을 수 없습니다.');
@@ -662,6 +677,12 @@
                 }
                 currentData = JSON.parse(cachedEl.textContent.trim());
                 renderDashboard(currentData);
+
+                // 3. Query parameter로 서버 URL이 전달되었으면 자동으로 실시간 예측 동기화 실행
+                if (queryApi && autoRun) {
+                    console.log('Query parameter API 서버 감지: 실시간 예측 자동 실행 시작 ->', endpointInput.value);
+                    triggerLiveForecast();
+                }
             } catch (err) {
                 console.error('초기 캐시 데이터 파싱/렌더링 실패:', err);
             }
