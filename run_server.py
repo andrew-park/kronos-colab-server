@@ -1,19 +1,36 @@
+import argparse
+import os
 import subprocess
 import time
 import re
 import sys
 
 def main():
+    parser = argparse.ArgumentParser(description="Kronos Colab Server Launcher")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=os.getenv("KRONOS_MODEL_SIZE", "base"),
+        choices=["mini", "small", "base", "large"],
+        help="Kronos model size (mini, small, base, large). Default: base"
+    )
+    args = parser.parse_args()
+    model_size = args.model.lower()
+
     print("1. Terminating existing Uvicorn and Cloudflare processes...")
     subprocess.run(["pkill", "-f", "uvicorn"], stderr=subprocess.DEVNULL)
     subprocess.run(["pkill", "-f", "cloudflared"], stderr=subprocess.DEVNULL)
     time.sleep(1)
 
-    print("2. Launching FastAPI server with Uvicorn (Port 8000)...")
+    print(f"2. Launching FastAPI server with Uvicorn (Model: {model_size.upper()}, Port 8000)...")
+    env = os.environ.copy()
+    env["KRONOS_MODEL_SIZE"] = model_size
+
     subprocess.Popen(
         ["uvicorn", "server:app", "--host", "127.0.0.1", "--port", "8000"],
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stderr=subprocess.DEVNULL,
+        env=env
     )
     time.sleep(8)  # 모델 로드 대기
 
@@ -37,7 +54,7 @@ def main():
 
     if public_url:
         print("\n" + "=" * 65)
-        print("🚀 Kronos Colab Server is live!")
+        print(f"🚀 Kronos Colab Server is live! (Model: {model_size.upper()})")
         print(f"📡 API Endpoint : {public_url}")
         print(f"📖 Swagger Docs : {public_url}/docs")
         print(f"🩺 Health Check : {public_url}/health")

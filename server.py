@@ -1,7 +1,7 @@
 import os
 import sys
 import asyncio
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 import torch
 import pandas as pd
@@ -15,10 +15,47 @@ if KRONOS_DIR not in sys.path:
 
 from model import Kronos, KronosTokenizer, KronosPredictor  # type: ignore
 
+# ---------------------------------------------------------------------------
+# Kronos 모델 레지스트리 및 환경변수 설정
+# ---------------------------------------------------------------------------
+MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
+    "mini": {
+        "model": "NeoQuasar/Kronos-mini",
+        "tokenizer": "NeoQuasar/Kronos-Tokenizer-2k",
+        "max_context": 2048,
+        "description": "Kronos-mini (4.1M params, 2048 context)",
+    },
+    "small": {
+        "model": "NeoQuasar/Kronos-small",
+        "tokenizer": "NeoQuasar/Kronos-Tokenizer-base",
+        "max_context": 512,
+        "description": "Kronos-small (24.7M params, 512 context)",
+    },
+    "base": {
+        "model": "NeoQuasar/Kronos-base",
+        "tokenizer": "NeoQuasar/Kronos-Tokenizer-base",
+        "max_context": 512,
+        "description": "Kronos-base (102.3M params, 512 context)",
+    },
+    "large": {
+        "model": "NeoQuasar/Kronos-large",
+        "tokenizer": "NeoQuasar/Kronos-Tokenizer-base",
+        "max_context": 512,
+        "description": "Kronos-large (499.2M params, 512 context)",
+    },
+}
+
+MODEL_SIZE = os.getenv("KRONOS_MODEL_SIZE", "base").strip().lower()
+if MODEL_SIZE not in MODEL_CONFIGS:
+    print(f"[Kronos Server] Warning: Unknown KRONOS_MODEL_SIZE='{MODEL_SIZE}', falling back to 'base'.")
+    MODEL_SIZE = "base"
+
+ACTIVE_CONFIG = MODEL_CONFIGS[MODEL_SIZE]
+
 app = FastAPI(
-    title="Kronos Financial Forecast API",
-    description="Kronos-base financial candlestick autoregressive inference engine",
-    version="1.0.0",
+    title=f"Kronos Financial Forecast API ({MODEL_SIZE.upper()})",
+    description=f"Kronos financial candlestick autoregressive inference engine - {ACTIVE_CONFIG['description']}",
+    version="1.1.0",
 )
 
 # ---------------------------------------------------------------------------
@@ -34,7 +71,7 @@ class Candle(BaseModel):
     amount: Optional[float] = 0.0
 
 class PredictRequest(BaseModel):
-    history: List[Candle] = Field(..., description="과거 K-line 캔들 리스트 (최소 10개, 최대 450개 권장)")
+    history: List[Candle] = Field(..., description="과거 K-line 캔들 리스트 (최소 10개 권장)")
     future_timestamps: List[str] = Field(..., description="예측할 미래 시점 타임스탬프 리스트")
     temperature: Optional[float] = Field(1.0, ge=0.1, le=2.0, description="생성 다양성 조절")
     top_p: Optional[float] = Field(0.9, ge=0.1, le=1.0, description="Nucleus sampling 확률")
@@ -51,6 +88,7 @@ class PredictedCandle(BaseModel):
 
 class PredictResponse(BaseModel):
     status: str
+    model_size: str
     predictions: List[PredictedCandle]
 
 # ---------------------------------------------------------------------------
@@ -63,11 +101,18 @@ predictor: Optional[KronosPredictor] = None
 @app.on_event("startup")
 def startup_event():
     global predictor
-    print(f"[Kronos Server] Initializing model on device: {device}...")
-    tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-base")
-    model = Kronos.from_pretrained("NeoQuasar/Kronos-base").to(device)
-    predictor = KronosPredictor(model, tokenizer, max_context=512, device=device)
-    print("[Kronos Server] Model successfully loaded and ready for inference.")
+    print(f"[Kronos Server] Target model size: {MODEL_SIZE} ({ACTIVE_CONFIG['model']})")
+    print(f"[Kronos Server] Context limit: {ACTIVE_CONFIG['max_context']}, Device: {device}")
+    print("[Kronos Server] Initializing model and tokenizer from Hugging Face...")
+    tokenizer = KronosTokenizer.from_pretrained(ACTIVE_CONFIG["tokenizer"])
+    model = Kronos.from_pretrained(ACTIVE_CONFIG["model"]).to(device)
+    predictor = KronosPredictor(
+        model,
+        tokenizer,
+        max_context=ACTIVE_CONFIG["max_context"],
+        device=device
+    )
+    print(f"[Kronos Server] Model '{ACTIVE_CONFIG['model']}' successfully loaded and ready for inference.")
 
 # ---------------------------------------------------------------------------
 # 3. 라우터 엔드포인트
@@ -79,7 +124,10 @@ def health_check():
         allocated_mb = round(torch.cuda.memory_allocated() / (1024 * 1024), 2)
     return {
         "status": "healthy",
-        "model": "NeoQuasar/Kronos-base",
+        "model_size": MODEL_SIZE,
+        "model": ACTIVE_CONFIG["model"],
+        "tokenizer": ACTIVE_CONFIG["tokenizer"],
+        "max_context": ACTIVE_CONFIG["max_context"],
         "device": device,
         "cuda_memory_allocated_mb": allocated_mb
     }
@@ -88,16 +136,17 @@ def health_check():
 async def predict_candlesticks(req: PredictRequest):
     lookback = len(req.history)
     pred_len = len(req.future_timestamps)
+    max_ctx = ACTIVE_CONFIG["max_context"]
 
     if lookback < 10:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="과거 캔들(history)은 최소 10개 이상이어야 합니다."
         )
-    if lookback + pred_len > 512:
+    if lookback + pred_len > max_ctx:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"컨텍스트 한도 초과: history({lookback}) + future({pred_len})는 512를 넘을 수 없습니다."
+            detail=f"컨텍스트 한도 초과: history({lookback}) + future({pred_len})는 {max_ctx}를 넘을 수 없습니다."
         )
 
     try:
@@ -137,4 +186,4 @@ async def predict_candlesticks(req: PredictRequest):
 
     pred_df['timestamp'] = y_timestamp.dt.strftime('%Y-%m-%d %H:%M:%S').values
     result = pred_df[['timestamp', 'open', 'high', 'low', 'close', 'volume', 'amount']].to_dict(orient="records")
-    return PredictResponse(status="success", predictions=result)
+    return PredictResponse(status="success", model_size=MODEL_SIZE, predictions=result)
