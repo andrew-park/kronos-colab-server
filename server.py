@@ -6,6 +6,7 @@ from typing import List, Optional, Dict, Any
 import torch
 import pandas as pd
 from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 # Upstream Kronos 레포지토리 경로를 sys.path에 동적 추가
@@ -56,6 +57,15 @@ app = FastAPI(
     title=f"Kronos Financial Forecast API ({MODEL_SIZE.upper()})",
     description=f"Kronos financial candlestick autoregressive inference engine - {ACTIVE_CONFIG['description']}",
     version="1.1.0",
+)
+
+# 브라우저 웹 데모(docs/kospi200.html) 등 외부 클라이언트 접속을 위한 CORS 허용
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ---------------------------------------------------------------------------
