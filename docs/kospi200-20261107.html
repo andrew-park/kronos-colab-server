@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kronos Forecast Snapshot (2026-11-07) | KOSPI 200 Index</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Slab:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Chart.js & plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #0f172a;
+            --surface: #ffffff;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --bullish: #ef4444; /* 한국 시장 상승: 빨강 */
+            --bearish: #3b82f6; /* 한국 시장 하락: 파랑 */
+            --forecast-color: #f97316;
+            --forecast-fill: rgba(249, 115, 22, 0.15);
+            --card-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 3rem 0 2.5rem 0;
+            border-bottom: 4px solid var(--primary);
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        header .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(37, 99, 235, 0.25);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #93c5fd;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        header h1 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.6rem;
+        }
+
+        header p.subtitle {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 680px;
+            margin: 0 auto 1.8rem auto;
+            font-weight: 400;
+        }
+
+        .header-links {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .header-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #f1f5f9;
+            text-decoration: none;
+            padding: 0.55rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Main layout */
+        main {
+            padding: 2.5rem 0 4rem 0;
+        }
+
+        .dashboard-card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-tags {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.86rem;
+            color: var(--text-muted);
+        }
+
+        .meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f1f5f9;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        /* Server connection bar */
+        .api-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1.75rem;
+            font-size: 0.85rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .endpoint-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-grow: 1;
+            max-width: 580px;
+        }
+
+        .endpoint-input-wrap label {
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .endpoint-input {
+            flex-grow: 1;
+            padding: 0.45rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            background: #ffffff;
+            color: var(--text-main);
+        }
+
+        .btn-refresh {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.86rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-refresh:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-refresh:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Metric cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.4rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+        }
+
+        .metric-card.primary-accent::before {
+            background: var(--primary);
+        }
+
+        .metric-card.bull-accent::before {
+            background: var(--bullish);
+        }
+
+        .metric-card.bear-accent::before {
+            background: var(--bearish);
+        }
+
+        .metric-card.forecast-accent::before {
+            background: var(--forecast-color);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .metric-card h3 {
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 0.4rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+        }
+
+        .metric-value.bull {
+            color: var(--bullish);
+        }
+
+        .metric-value.forecast {
+            color: var(--forecast-color);
+        }
+
+        .metric-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Chart container */
+        .chart-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .chart-legend-custom {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .chart-canvas-wrap {
+            position: relative;
+            width: 100%;
+            height: 440px;
+        }
+
+        /* Methodology & Explanations */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 860px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-card {
+            background: var(--surface);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 1.75rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .info-card h3 {
+            font-size: 1.25rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .info-card ul {
+            padding-left: 1.2rem;
+        }
+
+        .info-card li {
+            margin-bottom: 0.75rem;
+            color: #334155;
+            font-size: 0.92rem;
+        }
+
+        .info-card li strong {
+            color: var(--secondary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: #94a3b8;
+            padding: 2.5rem 0;
+            text-align: center;
+            font-size: 0.88rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer a {
+            color: #cbd5e1;
+            text-decoration: underline;
+        }
+
+        footer a:hover {
+            color: #ffffff;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-pill {
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pill.online {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-pill.cached {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-pill.error {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="badge">
+                <span class="pulse-dot"></span> Kronos Financial Foundation Model Live Demo
+            </div>
+            <h1>Kronos: KOSPI 200 Forecast Snapshot (2026-11-07)</h1>
+            <p class="subtitle">
+                Kronos 기반의 K-Line 토크나이저 및 파운데이션 모델을 활용한 코스피 200 지수 실시간 확률적 시계열 예측 데모
+            </p>
+            <div class="header-links">
+                <a href="https://github.com/andrew-park/kronos-colab-server" target="_blank" class="header-btn">
+                    💻 Colab Server GitHub
+                </a>
+                <a href="https://github.com/shiyu-coder/Kronos" target="_blank" class="header-btn">
+                    🏛️ Kronos Upstream
+                </a>
+                <a href="https://arxiv.org/abs/2508.02739" target="_blank" class="header-btn">
+                    📄 Read Paper (arXiv)
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Main Dashboard Card -->
+        <section class="dashboard-card">
+            <div class="card-header">
+                <div>
+                    <h2>📸 KOSPI 200 Forecast Snapshot Dashboard (2026-11-07)</h2>
+                    <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                        한국거래소 KOSPI 200 (KPI200) 일별 지수 및 향후 1개월(약 22거래일) 몬테카를로 확률 예측
+                    </div>
+                </div>
+                <div class="meta-tags">
+                    <div class="meta-tag">
+                        🕒 기준 시점: <strong id="meta-updated-time">-</strong>
+                    </div>
+                    <div class="meta-tag">
+                        📊 데이터: <strong>KOSPI 200 (과거 1년 일봉, 250봉)</strong>
+                    </div>
+                    <div class="meta-tag">
+                        🧠 모델: <strong id="meta-model-name">Kronos-base (102.3M)</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Server Connection Settings -->
+            <div class="api-status-bar">
+                <div class="endpoint-input-wrap">
+                    <label for="api-endpoint">API Server:</label>
+                    <input type="text" id="api-endpoint" class="endpoint-input" value="https://lbs-evidence-satisfy-published.trycloudflare.com" placeholder="https://your-colab-tunnel.trycloudflare.com">
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="server-status-pill" class="status-pill online">Snapshot: 2026-11-07</span>
+                    <button id="btn-run-forecast" class="btn-refresh" onclick="triggerLiveForecast()">
+                        <span>⚡ 실시간 예측 재실행</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Metric Cards (upside prob, predicted mean, volatility amp, latest close) -->
+            <div class="metrics-grid">
+                <div class="metric-card primary-accent">
+                    <h3>최근 종가 (Last Close)</h3>
+                    <div class="metric-value" id="metric-last-close">-</div>
+                    <div class="metric-desc" id="metric-last-date">최근 거래일 기준가</div>
+                </div>
+                <div class="metric-card bull-accent">
+                    <h3>상승 확률 (Upside Probability)</h3>
+                    <div class="metric-value bull" id="metric-upside-prob">-</div>
+                    <div class="metric-desc">1개월 후 주가가 최근 종가보다 높을 확률 (몬테카를로 샘플링)</div>
+                </div>
+                <div class="metric-card forecast-accent">
+                    <h3>1개월 후 예측 기대값 (Expected Mean)</h3>
+                    <div class="metric-value forecast" id="metric-expected-close">-</div>
+                    <div class="metric-desc" id="metric-expected-change">앙상블 다중 경로 시뮬레이션 평균 기대치</div>
+                </div>
+                <div class="metric-card">
+                    <h3>변동성 증폭 확률 (Volatility Amp)</h3>
+                    <div class="metric-value" id="metric-vol-amp">-</div>
+                    <div class="metric-desc">향후 1개월 예측 변동성이 최근 과거 변동성을 상회할 확률</div>
+                </div>
+            </div>
+
+            <!-- Chart Box -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <div>
+                        <h3 style="font-size: 1.15rem; color: var(--secondary); font-weight: 700;">KOSPI 200 가격 및 확률적 예측 밴드</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                            실선(파란색): 과거 지수 추이 | 점선(주황색): 예측 평균 | 음영 영역: 몬테카를로 경로 신뢰구간 (최대~최소)
+                        </p>
+                    </div>
+                    <div class="chart-legend-custom">
+                        <div class="legend-item">
+                            <span class="legend-indicator" style="background: #2563eb;"></span> 과거 지수
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-indicator" style="background: #f97316;"></span> Kronos 예측 평균
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-indicator" style="background: rgba(249, 115, 22, 0.25);"></span> 예측 불확실성 밴드
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-canvas-wrap">
+                    <canvas id="forecastChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Methodology & Details Section -->
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>⚙️ 예측 파이프라인 개요</h3>
+                <ul>
+                    <li>
+                        <strong>파운데이션 모델:</strong> <code id="methodology-model-name">Kronos-base (102.3M)</code> 모델이 과거 캔들스틱 토큰 시퀀스를 조건부 입력으로 받아 미래 K-Line을 자기회귀(Autoregressive) 방식으로 생성합니다.
+                    </li>
+                    <li>
+                        <strong>데이터 컨텍스트:</strong> KOSPI 200 지수의 최근 일별 Open, High, Low, Close, Volume 데이터 30~60봉을 컨텍스트로 전달합니다.
+                    </li>
+                    <li>
+                        <strong>몬테카를로 앙상블:</strong> Top-P (0.9), Temperature (0.75)의 Nucleus Sampling을 기반으로 여러 경로(Path)를 동시 시뮬레이션하여 점 추정치가 아닌 미래 확률 분포를 도출합니다.
+                    </li>
+                    <li>
+                        <strong>불확실성 정량화:</strong> 생성된 시나리오 분포의 평균(Mean)과 최대/최소 구간(Confidence Bounds)을 통해 방향성뿐만 아니라 예측의 확신도를 함께 시각화합니다.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3>🔬 Kronos 아키텍처 특징</h3>
+                <ul>
+                    <li>
+                        <strong>K-Line 전용 Tokenizer:</strong> 가격 캔들의 상대적 등락폭과 변동성, 볼륨 특성을 이산 토큰으로 압축 변환하는 고유의 토크나이저(Kronos-Tokenizer-2k)를 사용합니다.
+                    </li>
+                    <li>
+                        <strong>글로벌 금융 시장 사전학습:</strong> 전 세계 45개 이상 주요 암호화폐 및 주식 거래소의 방대한 캔들스틱 데이터를 학습하여 시장 미시구조와 가격 모멘텀 패턴을 파악합니다.
+                    </li>
+                    <li>
+                        <strong>초경량 고성능 Colab 서빙:</strong> Colab 무료 GPU(T4)에서도 수십 MB 미만의 VRAM으로 1초 이내에 앙상블 미래 예측을 추론할 수 있도록 최적화되었습니다.
+                    </li>
+                    <li>
+                        <strong>확장성:</strong> Mini(4.1M)부터 Small(24.7M), Base(102M), Large(499M)까지 동일한 인터페이스로 모델 확장이 가능합니다.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                Kronos Live Demonstration for KOSPI 200 &bull; Powered by <a href="https://github.com/andrew-park/kronos-colab-server" target="_blank">Kronos Colab Server</a> & <a href="https://github.com/shiyu-coder/Kronos" target="_blank">The Kronos Project</a>
+            </p>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;">
+                면책 조항: 본 데모는 Kronos 인공지능 모델의 학술 연구 및 기능 시연용이며, 실제 금융 투자에 대한 권유나 재정적 조언이 아닙니다.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Embedded Baseline Pre-computed Data & Client-Side Inference Logic -->
+    <script id="cached-data" type="application/json">
+{"updated_at": "2026-11-07 12:06:48 UTC (Snapshot 2026-11-07)", "symbol": "KPI200", "symbol_name": "KOSPI 200 Index", "model": "Kronos-base (102.3M)", "history": [{"timestamp": "2025-10-30 15:30:00", "open": 574.75, "high": 582.25, "low": 571.79, "close": 575.21, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-10-31 15:30:00", "open": 575.08, "high": 581.25, "low": 570.91, "close": 579.46, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-03 15:30:00", "open": 580.81, "high": 599.05, "low": 580.73, "close": 599.03, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-04 15:30:00", "open": 598.0, "high": 599.47, "low": 581.41, "close": 581.94, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-05 15:30:00", "open": 571.41, "high": 571.41, "low": 543.86, "close": 565.4, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-06 15:30:00", "open": 578.79, "high": 581.35, "low": 562.2, "close": 568.38, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-07 15:30:00", "open": 558.74, "high": 570.79, "low": 548.34, "close": 557.98, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-10 15:30:00", "open": 564.02, "high": 578.77, "low": 562.63, "close": 575.31, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-11 15:30:00", "open": 583.58, "high": 594.12, "low": 575.15, "close": 581.41, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-12 15:30:00", "open": 579.17, "high": 588.07, "low": 577.51, "close": 586.73, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-13 15:30:00", "open": 583.38, "high": 591.98, "low": 582.82, "close": 588.65, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-14 15:30:00", "open": 571.98, "high": 576.37, "low": 563.42, "close": 563.43, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-17 15:30:00", "open": 574.43, "high": 576.85, "low": 569.9, "close": 576.65, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-18 15:30:00", "open": 569.37, "high": 573.9, "low": 556.15, "close": 556.45, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-19 15:30:00", "open": 557.76, "high": 557.88, "low": 541.85, "close": 552.66, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-20 15:30:00", "open": 569.22, "high": 573.29, "low": 563.7, "close": 564.2, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-21 15:30:00", "open": 550.07, "high": 550.88, "low": 538.04, "close": 540.36, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-24 15:30:00", "open": 550.52, "high": 551.9, "low": 539.52, "close": 540.81, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-25 15:30:00", "open": 556.54, "high": 557.61, "low": 540.82, "close": 544.62, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-26 15:30:00", "open": 549.12, "high": 559.48, "low": 545.08, "close": 559.37, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-27 15:30:00", "open": 564.24, "high": 569.77, "low": 560.23, "close": 563.36, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-11-28 15:30:00", "open": 564.36, "high": 564.36, "low": 553.48, "close": 554.0, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-01 15:30:00", "open": 560.57, "high": 562.11, "low": 549.03, "close": 553.96, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-02 15:30:00", "open": 556.85, "high": 566.03, "low": 556.02, "close": 565.72, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-03 15:30:00", "open": 567.89, "high": 573.84, "low": 564.19, "close": 570.79, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-04 15:30:00", "open": 567.36, "high": 569.76, "low": 562.52, "close": 569.75, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-05 15:30:00", "open": 568.41, "high": 580.81, "low": 565.48, "close": 580.81, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-08 15:30:00", "open": 581.89, "high": 589.17, "low": 577.3, "close": 589.17, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-09 15:30:00", "open": 585.3, "high": 588.43, "low": 582.63, "close": 585.76, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-10 15:30:00", "open": 588.23, "high": 591.74, "low": 583.64, "close": 585.52, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-11 15:30:00", "open": 589.39, "high": 591.32, "low": 579.83, "close": 580.16, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-12 15:30:00", "open": 581.71, "high": 588.71, "low": 581.14, "close": 587.93, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-15 15:30:00", "open": 570.01, "high": 579.52, "low": 569.39, "close": 574.49, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-16 15:30:00", "open": 574.54, "high": 575.5, "low": 561.33, "close": 561.52, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-17 15:30:00", "open": 564.59, "high": 573.54, "low": 561.4, "close": 572.62, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-18 15:30:00", "open": 563.33, "high": 570.54, "low": 562.1, "close": 565.65, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-19 15:30:00", "open": 575.27, "high": 575.27, "low": 566.19, "close": 568.4, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-22 15:30:00", "open": 580.63, "high": 582.73, "low": 578.85, "close": 582.73, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-23 15:30:00", "open": 585.43, "high": 588.56, "low": 583.55, "close": 584.64, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-24 15:30:00", "open": 587.37, "high": 588.03, "low": 583.86, "close": 584.21, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-26 15:30:00", "open": 587.89, "high": 592.2, "low": 586.92, "close": 590.08, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-29 15:30:00", "open": 594.65, "high": 605.69, "low": 594.44, "close": 605.69, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2025-12-30 15:30:00", "open": 601.72, "high": 608.4, "low": 600.67, "close": 605.98, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-02 15:30:00", "open": 607.66, "high": 624.87, "low": 607.39, "close": 624.17, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-05 15:30:00", "open": 638.01, "high": 648.74, "low": 636.46, "close": 648.74, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-06 15:30:00", "open": 645.59, "high": 659.45, "low": 637.0, "close": 659.45, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-07 15:30:00", "open": 667.22, "high": 674.86, "low": 653.93, "close": 664.48, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-08 15:30:00", "open": 660.52, "high": 677.27, "low": 659.96, "close": 664.18, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-09 15:30:00", "open": 659.63, "high": 670.32, "low": 654.79, "close": 668.25, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-12 15:30:00", "open": 676.95, "high": 678.91, "low": 664.05, "close": 672.86, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-13 15:30:00", "open": 678.34, "high": 681.24, "low": 673.13, "close": 680.71, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-14 15:30:00", "open": 679.26, "high": 685.76, "low": 677.64, "close": 685.76, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-15 15:30:00", "open": 682.52, "high": 696.39, "low": 681.68, "close": 696.39, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-16 15:30:00", "open": 699.71, "high": 706.94, "low": 696.49, "close": 704.64, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-19 15:30:00", "open": 702.23, "high": 716.58, "low": 702.02, "close": 713.96, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-20 15:30:00", "open": 713.22, "high": 716.96, "low": 699.93, "close": 708.48, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-21 15:30:00", "open": 696.91, "high": 715.63, "low": 696.83, "close": 714.94, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-22 15:30:00", "open": 728.23, "high": 733.98, "low": 718.7, "close": 722.3, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-23 15:30:00", "open": 726.8, "high": 732.53, "low": 717.12, "close": 727.29, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-26 15:30:00", "open": 728.49, "high": 732.66, "low": 719.04, "close": 720.04, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-27 15:30:00", "open": 717.36, "high": 745.13, "low": 711.51, "close": 745.13, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-28 15:30:00", "open": 753.98, "high": 761.58, "low": 749.77, "close": 758.72, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-29 15:30:00", "open": 771.32, "high": 773.18, "low": 743.16, "close": 765.59, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-01-30 15:30:00", "open": 763.87, "high": 784.61, "low": 763.46, "close": 768.41, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-02 15:30:00", "open": 752.06, "high": 764.14, "low": 723.51, "close": 725.46, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-03 15:30:00", "open": 751.94, "high": 779.54, "low": 750.05, "close": 779.54, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-04 15:30:00", "open": 773.48, "high": 791.66, "low": 770.47, "close": 790.38, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-05 15:30:00", "open": 769.61, "high": 778.62, "low": 753.8, "close": 756.95, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-06 15:30:00", "open": 734.22, "high": 753.39, "low": 718.27, "close": 748.1, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-09 15:30:00", "open": 782.04, "high": 784.97, "low": 775.96, "close": 780.94, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-10 15:30:00", "open": 788.76, "high": 791.68, "low": 779.69, "close": 780.76, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-11 15:30:00", "open": 778.25, "high": 792.23, "low": 772.41, "close": 788.75, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-12 15:30:00", "open": 800.15, "high": 816.28, "low": 796.36, "close": 816.28, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-13 15:30:00", "open": 815.97, "high": 827.14, "low": 811.16, "close": 814.59, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-19 15:30:00", "open": 836.12, "high": 841.95, "low": 830.57, "close": 840.24, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-20 15:30:00", "open": 842.56, "high": 860.22, "low": 839.98, "close": 859.59, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-23 15:30:00", "open": 874.93, "high": 879.85, "low": 856.9, "close": 865.49, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-24 15:30:00", "open": 866.44, "high": 886.95, "low": 855.13, "close": 886.88, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-25 15:30:00", "open": 895.38, "high": 913.67, "low": 888.96, "close": 903.83, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-26 15:30:00", "open": 910.73, "high": 945.17, "low": 908.12, "close": 944.02, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-02-27 15:30:00", "open": 924.59, "high": 951.62, "low": 918.77, "close": 933.34, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-03 15:30:00", "open": 921.46, "high": 922.03, "low": 859.3, "close": 859.4, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-04 15:30:00", "open": 827.46, "high": 845.52, "low": 751.45, "close": 756.79, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-05 15:30:00", "open": 775.83, "high": 855.65, "low": 775.26, "close": 831.22, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-06 15:30:00", "open": 815.04, "high": 833.08, "low": 797.9, "close": 828.83, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-09 15:30:00", "open": 777.67, "high": 786.66, "low": 751.42, "close": 775.31, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-10 15:30:00", "open": 820.11, "high": 833.94, "low": 806.41, "close": 823.02, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-11 15:30:00", "open": 842.21, "high": 854.96, "low": 825.81, "close": 834.05, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-12 15:30:00", "open": 826.36, "high": 836.64, "low": 819.77, "close": 827.51, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-13 15:30:00", "open": 800.34, "high": 821.54, "low": 797.11, "close": 812.93, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-16 15:30:00", "open": 817.51, "high": 828.38, "low": 809.06, "close": 826.83, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-17 15:30:00", "open": 853.4, "high": 854.39, "low": 839.5, "close": 840.89, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-18 15:30:00", "open": 861.48, "high": 890.41, "low": 860.77, "close": 888.57, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-19 15:30:00", "open": 861.23, "high": 878.88, "low": 857.73, "close": 862.37, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-20 15:30:00", "open": 869.58, "high": 871.86, "low": 859.83, "close": 862.5, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-23 15:30:00", "open": 829.96, "high": 829.96, "low": 803.42, "close": 804.86, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-24 15:30:00", "open": 841.92, "high": 842.94, "low": 803.08, "close": 827.64, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-25 15:30:00", "open": 847.46, "high": 857.63, "low": 837.43, "close": 838.7, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-26 15:30:00", "open": 829.6, "high": 830.62, "low": 807.13, "close": 808.89, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-27 15:30:00", "open": 783.41, "high": 809.78, "low": 772.21, "close": 805.19, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-30 15:30:00", "open": 765.53, "high": 783.3, "low": 761.08, "close": 780.32, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-03-31 15:30:00", "open": 757.62, "high": 772.81, "low": 743.29, "close": 744.57, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-01 15:30:00", "open": 789.35, "high": 819.67, "low": 780.98, "close": 813.84, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-02 15:30:00", "open": 825.52, "high": 829.81, "low": 764.34, "close": 774.63, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-03 15:30:00", "open": 797.34, "high": 804.95, "low": 788.39, "close": 798.32, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-06 15:30:00", "open": 806.59, "high": 820.23, "low": 804.43, "close": 811.84, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-07 15:30:00", "open": 829.9, "high": 836.08, "low": 809.26, "close": 821.1, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-08 15:30:00", "open": 872.13, "high": 892.17, "low": 866.77, "close": 882.81, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-09 15:30:00", "open": 874.49, "high": 879.98, "low": 862.13, "close": 865.75, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-10 15:30:00", "open": 882.3, "high": 890.08, "low": 877.3, "close": 878.78, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-13 15:30:00", "open": 857.95, "high": 874.35, "low": 857.01, "close": 870.78, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-14 15:30:00", "open": 895.98, "high": 907.4, "low": 891.74, "close": 897.0, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-15 15:30:00", "open": 926.1, "high": 933.04, "low": 912.4, "close": 916.6, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-16 15:30:00", "open": 925.05, "high": 938.87, "low": 920.93, "close": 937.87, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-17 15:30:00", "open": 938.0, "high": 938.98, "low": 926.77, "close": 931.41, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-20 15:30:00", "open": 935.02, "high": 945.91, "low": 929.08, "close": 935.75, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-21 15:30:00", "open": 949.37, "high": 962.47, "low": 949.24, "close": 962.26, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-22 15:30:00", "open": 961.97, "high": 966.08, "low": 949.42, "close": 964.52, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-23 15:30:00", "open": 975.5, "high": 989.88, "low": 948.19, "close": 975.62, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-24 15:30:00", "open": 978.27, "high": 981.72, "low": 960.09, "close": 971.87, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-27 15:30:00", "open": 980.35, "high": 1002.78, "low": 980.02, "close": 995.33, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-28 15:30:00", "open": 1000.71, "high": 1011.6, "low": 995.35, "close": 999.03, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-29 15:30:00", "open": 994.38, "high": 1009.87, "low": 991.46, "close": 1006.59, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-04-30 15:30:00", "open": 1015.18, "high": 1017.96, "low": 991.91, "close": 992.15, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-04 15:30:00", "open": 1022.41, "high": 1049.87, "low": 1014.85, "close": 1049.66, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-06 15:30:00", "open": 1076.73, "high": 1137.23, "low": 1076.73, "close": 1129.63, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-07 15:30:00", "open": 1150.18, "high": 1156.72, "low": 1110.37, "close": 1149.86, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-08 15:30:00", "open": 1124.95, "high": 1153.8, "low": 1120.24, "close": 1151.17, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-11 15:30:00", "open": 1201.01, "high": 1226.18, "low": 1192.24, "close": 1211.44, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-12 15:30:00", "open": 1233.82, "high": 1241.39, "low": 1148.24, "close": 1183.41, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-13 15:30:00", "open": 1158.87, "high": 1222.53, "low": 1143.13, "close": 1220.17, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-14 15:30:00", "open": 1223.66, "high": 1246.61, "low": 1220.36, "close": 1243.17, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-15 15:30:00", "open": 1236.66, "high": 1253.67, "low": 1143.19, "close": 1162.39, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-18 15:30:00", "open": 1154.84, "high": 1193.32, "low": 1109.59, "close": 1171.3, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-19 15:30:00", "open": 1154.09, "high": 1159.13, "low": 1110.81, "close": 1132.42, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-20 15:30:00", "open": 1141.57, "high": 1142.24, "low": 1097.82, "close": 1125.51, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-21 15:30:00", "open": 1171.1, "high": 1226.59, "low": 1170.63, "close": 1225.22, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-22 15:30:00", "open": 1232.73, "high": 1235.4, "low": 1214.77, "close": 1226.03, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-26 15:30:00", "open": 1262.2, "high": 1274.96, "low": 1252.13, "close": 1260.53, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-27 15:30:00", "open": 1296.31, "high": 1340.85, "low": 1291.71, "close": 1298.86, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-28 15:30:00", "open": 1287.18, "high": 1305.67, "low": 1235.32, "close": 1292.57, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-05-29 15:30:00", "open": 1327.15, "high": 1343.14, "low": 1310.59, "close": 1342.82, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-01 15:30:00", "open": 1344.09, "high": 1412.58, "low": 1343.96, "close": 1399.91, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-02 15:30:00", "open": 1419.07, "high": 1430.49, "low": 1353.19, "close": 1407.23, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-04 15:30:00", "open": 1374.74, "high": 1402.04, "low": 1367.15, "close": 1379.56, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-05 15:30:00", "open": 1323.25, "high": 1338.13, "low": 1278.65, "close": 1297.02, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-08 15:30:00", "open": 1282.81, "high": 1282.81, "low": 1177.72, "close": 1186.54, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-09 15:30:00", "open": 1221.75, "high": 1297.79, "low": 1206.94, "close": 1293.4, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-10 15:30:00", "open": 1258.44, "high": 1274.61, "low": 1197.04, "close": 1227.12, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-11 15:30:00", "open": 1190.75, "high": 1243.45, "low": 1171.45, "close": 1231.54, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-12 15:30:00", "open": 1317.78, "high": 1345.97, "low": 1285.48, "close": 1291.32, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-15 15:30:00", "open": 1360.33, "high": 1370.94, "low": 1346.15, "close": 1360.26, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-16 15:30:00", "open": 1386.42, "high": 1396.59, "low": 1357.84, "close": 1391.74, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-17 15:30:00", "open": 1372.13, "high": 1418.39, "low": 1370.26, "close": 1416.97, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-18 15:30:00", "open": 1420.99, "high": 1466.74, "low": 1420.95, "close": 1459.23, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-19 15:30:00", "open": 1499.31, "high": 1518.11, "low": 1423.84, "close": 1459.48, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-22 15:30:00", "open": 1442.16, "high": 1500.12, "low": 1434.1, "close": 1477.22, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-23 15:30:00", "open": 1470.75, "high": 1487.31, "low": 1320.8, "close": 1321.7, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-24 15:30:00", "open": 1348.99, "high": 1389.53, "low": 1300.92, "close": 1369.62, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-25 15:30:00", "open": 1408.25, "high": 1473.83, "low": 1405.73, "close": 1454.15, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-26 15:30:00", "open": 1433.15, "high": 1441.9, "low": 1318.56, "close": 1366.49, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-29 15:30:00", "open": 1352.07, "high": 1377.12, "low": 1311.25, "close": 1352.54, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-06-30 15:30:00", "open": 1356.86, "high": 1404.1, "low": 1325.41, "close": 1370.73, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-01 15:30:00", "open": 1388.86, "high": 1396.54, "low": 1309.84, "close": 1335.36, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-02 15:30:00", "open": 1269.77, "high": 1304.45, "low": 1213.66, "close": 1219.62, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-03 15:30:00", "open": 1235.2, "high": 1308.19, "low": 1176.04, "close": 1299.3, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-06 15:30:00", "open": 1316.14, "high": 1341.16, "low": 1253.99, "close": 1293.13, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-07 15:30:00", "open": 1271.07, "high": 1278.15, "low": 1180.72, "close": 1225.57, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-08 15:30:00", "open": 1190.6, "high": 1251.83, "low": 1149.71, "close": 1158.37, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-09 15:30:00", "open": 1202.01, "high": 1212.49, "low": 1130.56, "close": 1169.73, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-10 15:30:00", "open": 1214.66, "high": 1236.84, "low": 1188.54, "close": 1196.69, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-13 15:30:00", "open": 1185.03, "high": 1204.96, "low": 1074.29, "close": 1078.78, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-14 15:30:00", "open": 1073.0, "high": 1112.5, "low": 1020.62, "close": 1092.23, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-15 15:30:00", "open": 1129.73, "high": 1189.29, "low": 1129.41, "close": 1163.9, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-16 15:30:00", "open": 1106.26, "high": 1111.32, "low": 1067.14, "close": 1080.36, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-20 15:30:00", "open": 1051.25, "high": 1083.43, "low": 1024.77, "close": 1032.52, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-21 15:30:00", "open": 1038.95, "high": 1089.08, "low": 1018.67, "close": 1073.39, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-22 15:30:00", "open": 1125.36, "high": 1143.93, "low": 1079.09, "close": 1080.22, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-23 15:30:00", "open": 1109.11, "high": 1129.67, "low": 1093.73, "close": 1126.33, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-24 15:30:00", "open": 1110.62, "high": 1110.62, "low": 1048.54, "close": 1055.58, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-27 15:30:00", "open": 1076.67, "high": 1077.01, "low": 1034.06, "close": 1069.22, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-28 15:30:00", "open": 1008.69, "high": 1011.79, "low": 941.08, "close": 945.69, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-29 15:30:00", "open": 957.46, "high": 982.09, "low": 818.98, "close": 887.2, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-30 15:30:00", "open": 891.08, "high": 938.15, "low": 863.04, "close": 872.49, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-07-31 15:30:00", "open": 880.79, "high": 1053.39, "low": 877.06, "close": 1046.81, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-03 15:30:00", "open": 1005.4, "high": 1013.07, "low": 981.48, "close": 986.72, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-04 15:30:00", "open": 1002.75, "high": 1009.09, "low": 953.87, "close": 1000.03, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-05 15:30:00", "open": 1042.4, "high": 1053.19, "low": 1029.11, "close": 1038.59, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-06 15:30:00", "open": 1016.93, "high": 1028.69, "low": 975.74, "close": 982.92, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-07 15:30:00", "open": 994.75, "high": 1004.61, "low": 960.79, "close": 974.73, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-10 15:30:00", "open": 982.71, "high": 998.62, "low": 967.33, "close": 977.84, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-11 15:30:00", "open": 967.57, "high": 998.29, "low": 962.94, "close": 987.4, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-12 15:30:00", "open": 1002.58, "high": 1045.31, "low": 998.71, "close": 1029.43, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-13 15:30:00", "open": 1063.04, "high": 1084.0, "low": 1060.23, "close": 1071.24, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-14 15:30:00", "open": 1103.18, "high": 1105.09, "low": 1077.08, "close": 1098.18, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-18 15:30:00", "open": 1125.72, "high": 1142.97, "low": 1068.52, "close": 1082.0, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-19 15:30:00", "open": 1023.7, "high": 1037.25, "low": 1003.46, "close": 1012.61, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-20 15:30:00", "open": 1049.11, "high": 1089.92, "low": 1033.72, "close": 1080.98, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-21 15:30:00", "open": 1066.22, "high": 1103.8, "low": 1063.52, "close": 1096.25, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-24 15:30:00", "open": 1089.64, "high": 1090.67, "low": 1048.08, "close": 1054.01, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-25 15:30:00", "open": 1025.65, "high": 1061.9, "low": 1005.77, "close": 1060.68, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-26 15:30:00", "open": 1058.12, "high": 1085.96, "low": 1053.23, "close": 1071.16, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-27 15:30:00", "open": 1103.76, "high": 1104.63, "low": 1076.99, "close": 1088.61, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-28 15:30:00", "open": 1077.74, "high": 1088.07, "low": 1064.78, "close": 1065.7, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-08-31 15:30:00", "open": 1036.58, "high": 1071.88, "low": 1025.92, "close": 1071.85, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-01 15:30:00", "open": 1065.37, "high": 1079.91, "low": 1056.64, "close": 1075.3, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-02 15:30:00", "open": 1040.43, "high": 1053.2, "low": 1030.77, "close": 1031.53, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-03 15:30:00", "open": 1046.17, "high": 1050.77, "low": 1009.7, "close": 1032.82, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-04 15:30:00", "open": 1045.4, "high": 1062.76, "low": 1041.46, "close": 1051.52, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-07 15:30:00", "open": 1090.72, "high": 1105.19, "low": 1083.21, "close": 1105.19, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-08 15:30:00", "open": 1113.02, "high": 1137.39, "low": 1099.15, "close": 1100.08, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-09 15:30:00", "open": 1102.39, "high": 1127.02, "low": 1101.86, "close": 1114.61, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-10 15:30:00", "open": 1113.43, "high": 1119.68, "low": 1089.8, "close": 1112.13, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-11 15:30:00", "open": 1073.46, "high": 1096.81, "low": 1073.43, "close": 1090.22, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-14 15:30:00", "open": 1052.91, "high": 1066.64, "low": 1046.27, "close": 1050.83, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-15 15:30:00", "open": 1047.75, "high": 1057.71, "low": 1034.63, "close": 1042.46, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-16 15:30:00", "open": 1039.81, "high": 1060.05, "low": 1037.9, "close": 1060.05, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-17 15:30:00", "open": 1070.27, "high": 1074.76, "low": 1055.19, "close": 1058.27, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-18 15:30:00", "open": 1087.24, "high": 1093.33, "low": 1078.05, "close": 1090.23, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-21 15:30:00", "open": 1097.76, "high": 1115.89, "low": 1097.68, "close": 1112.16, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-22 15:30:00", "open": 1138.2, "high": 1141.18, "low": 1107.73, "close": 1113.3, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-23 15:30:00", "open": 1137.29, "high": 1137.56, "low": 1114.46, "close": 1126.12, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-28 15:30:00", "open": 1121.1, "high": 1123.34, "low": 1089.26, "close": 1089.28, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-29 15:30:00", "open": 1082.06, "high": 1093.79, "low": 1073.61, "close": 1088.15, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-09-30 15:30:00", "open": 1100.09, "high": 1104.62, "low": 1078.5, "close": 1081.82, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-01 15:30:00", "open": 1077.35, "high": 1104.48, "low": 1068.45, "close": 1104.48, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-02 15:30:00", "open": 1098.33, "high": 1110.75, "low": 1095.99, "close": 1109.05, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-06 15:30:00", "open": 1114.98, "high": 1115.52, "low": 1089.26, "close": 1095.83, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-07 15:30:00", "open": 1082.2, "high": 1104.75, "low": 1073.62, "close": 1073.63, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-08 15:30:00", "open": 1074.98, "high": 1076.7, "low": 1044.52, "close": 1044.52, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-12 15:30:00", "open": 1036.16, "high": 1039.33, "low": 1002.35, "close": 1004.92, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-13 15:30:00", "open": 972.51, "high": 975.69, "low": 925.11, "close": 942.07, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-14 15:30:00", "open": 946.73, "high": 968.9, "low": 926.94, "close": 936.82, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-15 15:30:00", "open": 881.2, "high": 894.74, "low": 844.06, "close": 860.7, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-16 15:30:00", "open": 877.69, "high": 902.44, "low": 865.05, "close": 878.16, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-19 15:30:00", "open": 848.51, "high": 891.3, "low": 848.51, "close": 891.3, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-20 15:30:00", "open": 886.63, "high": 886.63, "low": 847.99, "close": 858.78, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-21 15:30:00", "open": 878.83, "high": 905.48, "low": 872.83, "close": 891.04, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-22 15:30:00", "open": 880.55, "high": 892.72, "low": 849.54, "close": 858.02, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-23 15:30:00", "open": 836.73, "high": 862.77, "low": 820.84, "close": 862.77, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-26 15:30:00", "open": 855.29, "high": 867.24, "low": 848.49, "close": 851.51, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-27 15:30:00", "open": 884.27, "high": 897.84, "low": 876.27, "close": 881.07, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-28 15:30:00", "open": 902.94, "high": 949.6, "low": 898.62, "close": 946.4, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-29 15:30:00", "open": 948.41, "high": 966.83, "low": 914.78, "close": 935.87, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-10-30 15:30:00", "open": 905.22, "high": 910.42, "low": 877.03, "close": 899.78, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-02 15:30:00", "open": 885.06, "high": 929.81, "low": 880.12, "close": 920.63, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-03 15:30:00", "open": 894.87, "high": 900.31, "low": 879.94, "close": 885.67, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-04 15:30:00", "open": 910.04, "high": 916.67, "low": 847.36, "close": 889.25, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-05 15:30:00", "open": 869.38, "high": 870.91, "low": 830.3, "close": 837.78, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-06 15:30:00", "open": 821.82, "high": 823.03, "low": 758.63, "close": 783.23, "volume": 100000.0, "amount": 1000000.0}], "future_timestamps": ["2026-11-09 15:30:00", "2026-11-10 15:30:00", "2026-11-11 15:30:00", "2026-11-12 15:30:00", "2026-11-13 15:30:00", "2026-11-16 15:30:00", "2026-11-17 15:30:00", "2026-11-18 15:30:00", "2026-11-19 15:30:00", "2026-11-20 15:30:00", "2026-11-23 15:30:00", "2026-11-24 15:30:00", "2026-11-25 15:30:00", "2026-11-26 15:30:00", "2026-11-27 15:30:00", "2026-11-30 15:30:00", "2026-12-01 15:30:00", "2026-12-02 15:30:00", "2026-12-03 15:30:00", "2026-12-04 15:30:00", "2026-12-07 15:30:00", "2026-12-08 15:30:00"], "predictions_runs": [[{"timestamp": "2026-11-09 15:30:00", "open": 764.614501953125, "high": 822.3328857421875, "low": 762.9837036132812, "close": 813.0665893554688, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-10 15:30:00", "open": 804.0336303710938, "high": 813.9981079101562, "low": 781.715576171875, "close": 792.103759765625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-11 15:30:00", "open": 779.838623046875, "high": 806.8670043945312, "low": 771.343505859375, "close": 798.4051513671875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-12 15:30:00", "open": 788.94677734375, "high": 793.5899658203125, "low": 768.1776733398438, "close": 771.8151245117188, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-13 15:30:00", "open": 763.9158935546875, "high": 783.037353515625, "low": 748.711181640625, "close": 769.093505859375, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-16 15:30:00", "open": 751.012451171875, "high": 791.572509765625, "low": 752.8922729492188, "close": 786.248779296875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-17 15:30:00", "open": 772.171630859375, "high": 789.6871337890625, "low": 761.8634643554688, "close": 776.0035400390625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-18 15:30:00", "open": 775.39453125, "high": 790.4677734375, "low": 768.2752075195312, "close": 778.6517944335938, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-19 15:30:00", "open": 765.4468994140625, "high": 789.0189208984375, "low": 761.2611083984375, "close": 781.5281982421875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-20 15:30:00", "open": 773.005126953125, "high": 782.1314697265625, "low": 754.962158203125, "close": 766.876708984375, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-23 15:30:00", "open": 760.542236328125, "high": 777.8865966796875, "low": 756.5372314453125, "close": 769.6078491210938, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-24 15:30:00", "open": 766.3265991210938, "high": 769.4769287109375, "low": 751.1250610351562, "close": 752.7244262695312, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-25 15:30:00", "open": 751.56787109375, "high": 759.3832397460938, "low": 747.83349609375, "close": 751.4132080078125, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-26 15:30:00", "open": 748.0557250976562, "high": 751.2275390625, "low": 736.419189453125, "close": 737.2006225585938, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-27 15:30:00", "open": 731.5467529296875, "high": 746.1959228515625, "low": 729.7760009765625, "close": 740.1801147460938, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-30 15:30:00", "open": 737.16162109375, "high": 756.869140625, "low": 734.623046875, "close": 749.6696166992188, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-01 15:30:00", "open": 727.427490234375, "high": 754.6023559570312, "low": 732.1537475585938, "close": 754.0028076171875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-02 15:30:00", "open": 747.1898193359375, "high": 753.41796875, "low": 742.265380859375, "close": 747.1529541015625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-03 15:30:00", "open": 745.5208129882812, "high": 752.356689453125, "low": 742.6456298828125, "close": 747.16015625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-04 15:30:00", "open": 740.5947265625, "high": 742.5220947265625, "low": 728.00732421875, "close": 729.6566162109375, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-07 15:30:00", "open": 727.0817260742188, "high": 739.6390380859375, "low": 722.8448486328125, "close": 734.6053466796875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-08 15:30:00", "open": 732.5315551757812, "high": 735.0672607421875, "low": 719.225830078125, "close": 720.4840087890625, "volume": 100000.0, "amount": 1000000.0}], [{"timestamp": "2026-11-09 15:30:00", "open": 782.9630737304688, "high": 797.585205078125, "low": 766.5357666015625, "close": 777.4351196289062, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-10 15:30:00", "open": 765.0380859375, "high": 801.7989501953125, "low": 744.0029296875, "close": 793.0970458984375, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-11 15:30:00", "open": 784.5333251953125, "high": 795.2982177734375, "low": 769.619873046875, "close": 777.534423828125, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-12 15:30:00", "open": 780.6494140625, "high": 790.470458984375, "low": 771.674560546875, "close": 776.8212890625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-13 15:30:00", "open": 776.3734130859375, "high": 786.589111328125, "low": 769.639892578125, "close": 776.2484130859375, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-16 15:30:00", "open": 777.5025634765625, "high": 786.90966796875, "low": 768.9390258789062, "close": 773.56591796875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-17 15:30:00", "open": 771.122802734375, "high": 793.3388671875, "low": 764.2433471679688, "close": 785.0289306640625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-18 15:30:00", "open": 779.93603515625, "high": 788.734375, "low": 774.2035522460938, "close": 778.570068359375, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-19 15:30:00", "open": 776.68701171875, "high": 786.5180053710938, "low": 771.8726196289062, "close": 777.1957397460938, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-20 15:30:00", "open": 772.5797729492188, "high": 784.169189453125, "low": 759.3726806640625, "close": 771.27392578125, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-23 15:30:00", "open": 771.3974609375, "high": 780.2147827148438, "low": 763.65673828125, "close": 767.38232421875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-24 15:30:00", "open": 756.6016235351562, "high": 779.0282592773438, "low": 750.408935546875, "close": 771.8035278320312, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-25 15:30:00", "open": 744.4068603515625, "high": 776.0275268554688, "low": 733.3873901367188, "close": 761.5573120117188, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-26 15:30:00", "open": 739.2448120117188, "high": 776.5184936523438, "low": 733.7749633789062, "close": 767.0969848632812, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-27 15:30:00", "open": 752.859619140625, "high": 762.0029907226562, "low": 736.0559692382812, "close": 744.1743774414062, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-30 15:30:00", "open": 740.6987915039062, "high": 760.3465576171875, "low": 740.6881713867188, "close": 754.8427124023438, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-01 15:30:00", "open": 744.9368286132812, "high": 754.632080078125, "low": 732.63623046875, "close": 739.8135375976562, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-02 15:30:00", "open": 731.80859375, "high": 746.9345092773438, "low": 729.3076171875, "close": 739.9760131835938, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-03 15:30:00", "open": 740.4990844726562, "high": 751.1795654296875, "low": 737.3104248046875, "close": 743.7160034179688, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-04 15:30:00", "open": 742.3631591796875, "high": 746.0936889648438, "low": 731.8701782226562, "close": 732.7589721679688, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-07 15:30:00", "open": 741.6195678710938, "high": 764.0025024414062, "low": 744.25390625, "close": 759.1279296875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-08 15:30:00", "open": 740.1223754882812, "high": 775.8013916015625, "low": 737.4880981445312, "close": 768.1867065429688, "volume": 100000.0, "amount": 1000000.0}], [{"timestamp": "2026-11-09 15:30:00", "open": 777.111328125, "high": 796.4212646484375, "low": 767.1322631835938, "close": 781.7037353515625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-10 15:30:00", "open": 781.3911743164062, "high": 796.741455078125, "low": 768.063720703125, "close": 779.4761352539062, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-11 15:30:00", "open": 750.8867797851562, "high": 785.329345703125, "low": 743.540283203125, "close": 773.4970703125, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-12 15:30:00", "open": 769.345458984375, "high": 777.8277587890625, "low": 758.0455322265625, "close": 762.904052734375, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-13 15:30:00", "open": 769.2274780273438, "high": 788.24755859375, "low": 767.2481689453125, "close": 780.1447143554688, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-16 15:30:00", "open": 777.75830078125, "high": 783.9273681640625, "low": 769.7971801757812, "close": 772.6686401367188, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-17 15:30:00", "open": 771.81689453125, "high": 781.7586669921875, "low": 762.3277587890625, "close": 768.2456665039062, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-18 15:30:00", "open": 761.2234497070312, "high": 778.6438598632812, "low": 758.60107421875, "close": 770.7041625976562, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-19 15:30:00", "open": 761.0679321289062, "high": 772.1407470703125, "low": 749.6629638671875, "close": 757.7272338867188, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-20 15:30:00", "open": 758.200439453125, "high": 769.6895751953125, "low": 746.02734375, "close": 754.0472412109375, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-23 15:30:00", "open": 760.581787109375, "high": 775.2703247070312, "low": 755.3641357421875, "close": 764.4020385742188, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-24 15:30:00", "open": 760.2239990234375, "high": 767.4326782226562, "low": 749.6372680664062, "close": 754.8488159179688, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-25 15:30:00", "open": 753.7386474609375, "high": 765.1832275390625, "low": 750.88720703125, "close": 756.9906616210938, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-26 15:30:00", "open": 756.454345703125, "high": 763.5435180664062, "low": 747.396240234375, "close": 750.302978515625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-27 15:30:00", "open": 750.6649169921875, "high": 761.1642456054688, "low": 747.7657470703125, "close": 753.696533203125, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-11-30 15:30:00", "open": 752.1729736328125, "high": 761.1741943359375, "low": 750.0963134765625, "close": 754.1173706054688, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-01 15:30:00", "open": 748.7383422851562, "high": 764.8324584960938, "low": 745.3753662109375, "close": 757.2401123046875, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-02 15:30:00", "open": 728.4346923828125, "high": 760.0845947265625, "low": 731.9002685546875, "close": 758.6295776367188, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-03 15:30:00", "open": 751.5286865234375, "high": 756.4117431640625, "low": 742.14990234375, "close": 744.752197265625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-04 15:30:00", "open": 748.4356689453125, "high": 755.2874145507812, "low": 742.318603515625, "close": 747.2467041015625, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-07 15:30:00", "open": 744.7271728515625, "high": 750.1510009765625, "low": 740.9556884765625, "close": 742.5995483398438, "volume": 100000.0, "amount": 1000000.0}, {"timestamp": "2026-12-08 15:30:00", "open": 744.293701171875, "high": 755.8499145507812, "low": 743.564697265625, "close": 750.0623168945312, "volume": 100000.0, "amount": 1000000.0}]]}
+    </script>
+
+    <script>
+        // 전역 상태 및 차트 인스턴스
+        let chartInstance = null;
+        let currentData = null;
+
+        async function checkServerHealthAndModel(endpoint) {
+            if (!endpoint) return;
+            const baseUrl = endpoint.replace(/\/$/, '');
+            try {
+                const resp = await fetch(baseUrl + '/health');
+                if (resp.ok) {
+                    const info = await resp.json();
+                    if (info.model || info.model_size) {
+                        const size = (info.model_size || 'base').toUpperCase();
+                        let paramText = '';
+                        if (size === 'MINI') paramText = '4.1M';
+                        else if (size === 'SMALL') paramText = '24.7M';
+                        else if (size === 'BASE') paramText = '102.3M';
+                        else if (size === 'LARGE') paramText = '499.2M';
+
+                        const displayTitle = 'Kronos-' + (info.model_size || 'base').toLowerCase() + (paramText ? ' (' + paramText + ')' : '');
+                        
+                        const metaModelEl = document.getElementById('meta-model-name');
+                        if (metaModelEl) metaModelEl.innerText = displayTitle;
+
+                        const methodModelEl = document.getElementById('methodology-model-name');
+                        if (methodModelEl) methodModelEl.innerText = displayTitle;
+
+                        const headerBadge = document.querySelector('header .badge');
+                        if (headerBadge) {
+                            headerBadge.innerHTML = '<span class="pulse-dot"></span> Kronos Live Demo (' + displayTitle + ')';
+                        }
+                        console.log('서버 모델 확인 완료:', displayTitle, info);
+                    }
+                }
+            } catch (err) {
+                console.warn('/health 확인 실패:', err);
+            }
+        }
+
+        function initDashboard() {
+            try {
+                // 1. URL Query Parameter 파싱 (?url=..., ?api=..., ?server=..., ?endpoint=...)
+                const urlParams = new URLSearchParams(window.location.search);
+                const queryApi = urlParams.get('url') || urlParams.get('api') || urlParams.get('server') || urlParams.get('endpoint');
+                const autoRun = urlParams.get('autorun') !== 'false'; // autorun 기본 true (query param 제공 시)
+
+                const endpointInput = document.getElementById('api-endpoint');
+                if (queryApi && endpointInput) {
+                    let formattedUrl = queryApi.trim();
+                    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+                        formattedUrl = 'https://' + formattedUrl;
+                    }
+                    endpointInput.value = formattedUrl;
+                }
+
+                // 2. 기본 캐시 데이터 파싱 및 초기 렌더링
+                const cachedEl = document.getElementById('cached-data');
+                if (!cachedEl) {
+                    console.error('cached-data 엘리먼트를 찾을 수 없습니다.');
+                    return;
+                }
+                currentData = JSON.parse(cachedEl.textContent.trim());
+                renderDashboard(currentData);
+
+                // 3. 서버 /health 엔드포인트 비동기 조회하여 실제 모델 크기 반영
+                if (endpointInput && endpointInput.value) {
+                    checkServerHealthAndModel(endpointInput.value);
+                }
+
+                // 4. Query parameter로 서버 URL이 전달되었으면 자동으로 실시간 예측 동기화 실행
+                if (queryApi && autoRun) {
+                    console.log('Query parameter API 서버 감지: 실시간 예측 자동 실행 시작 ->', endpointInput.value);
+                    triggerLiveForecast();
+                }
+            } catch (err) {
+                console.error('초기 캐시 데이터 파싱/렌더링 실패:', err);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', initDashboard);
+        } else {
+            // 이미 DOM 로드가 끝난 상태일 경우 즉시 실행
+            initDashboard();
+        }
+
+        function renderDashboard(data) {
+            document.getElementById('meta-updated-time').innerText = data.updated_at || new Date().toLocaleString();
+
+            const history = data.history;
+            const predictionsRuns = data.predictions_runs;
+            const futureTimestamps = data.future_timestamps;
+
+            if (!history || history.length === 0 || !predictionsRuns || predictionsRuns.length === 0) {
+                return;
+            }
+
+            const lastCandle = history[history.length - 1];
+            const lastClose = lastCandle.close;
+            document.getElementById('metric-last-close').innerText = lastClose.toFixed(2);
+            document.getElementById('metric-last-date').innerText = '최근 기준: ' + lastCandle.timestamp.split(' ')[0];
+
+            // 미래 각 시점별 통계 계산 (평균, 최소, 최대)
+            const predLength = futureTimestamps.length;
+            const runCount = predictionsRuns.length;
+
+            const predMeans = [];
+            const predMins = [];
+            const predMaxs = [];
+            let upsideHits = 0;
+
+            for (let t = 0; t < predLength; t++) {
+                const closesAtT = [];
+                for (let r = 0; r < runCount; r++) {
+                    if (predictionsRuns[r] && predictionsRuns[r][t]) {
+                        closesAtT.push(predictionsRuns[r][t].close);
+                    }
+                }
+                if (closesAtT.length > 0) {
+                    const mean = closesAtT.reduce((a, b) => a + b, 0) / closesAtT.length;
+                    const min = Math.min(...closesAtT);
+                    const max = Math.max(...closesAtT);
+                    predMeans.push(mean);
+                    predMins.push(min);
+                    predMaxs.push(max);
+                }
+            }
+
+            // 10일 후 최종 종가의 상승 확률 계산
+            for (let r = 0; r < runCount; r++) {
+                const finalCandle = predictionsRuns[r][predLength - 1];
+                if (finalCandle && finalCandle.close > lastClose) {
+                    upsideHits++;
+                }
+            }
+            const upsideProb = ((upsideHits / runCount) * 100).toFixed(1);
+            document.getElementById('metric-upside-prob').innerText = upsideProb + '%';
+
+            // 최종 기대 종가 및 변화율
+            const finalExpectedClose = predMeans[predMeans.length - 1];
+            document.getElementById('metric-expected-close').innerText = finalExpectedClose.toFixed(2);
+            const changeDiff = finalExpectedClose - lastClose;
+            const changePercent = ((changeDiff / lastClose) * 100).toFixed(2);
+            const changeSign = changeDiff >= 0 ? '+' : '';
+            document.getElementById('metric-expected-change').innerText = '대비 ' + changeSign + changeDiff.toFixed(2) + ' (' + changeSign + changePercent + '%)';
+
+            // 과거 변동성 vs 미래 예측 변동성 (Volatility Amplification)
+            let histReturns = [];
+            for (let i = Math.max(1, history.length - 20); i < history.length; i++) {
+                histReturns.push(Math.abs((history[i].close - history[i - 1].close) / history[i - 1].close));
+            }
+            const histAvgVol = histReturns.reduce((a, b) => a + b, 0) / histReturns.length;
+
+            let volAmpHits = 0;
+            for (let r = 0; r < runCount; r++) {
+                const run = predictionsRuns[r];
+                let runReturns = [];
+                let prev = lastClose;
+                for (let t = 0; t < run.length; t++) {
+                    runReturns.push(Math.abs((run[t].close - prev) / prev));
+                    prev = run[t].close;
+                }
+                const runAvgVol = runReturns.reduce((a, b) => a + b, 0) / runReturns.length;
+                if (runAvgVol > histAvgVol) {
+                    volAmpHits++;
+                }
+            }
+            const volAmpProb = ((volAmpHits / runCount) * 100).toFixed(1);
+            document.getElementById('metric-vol-amp').innerText = volAmpProb + '%';
+
+            // Chart.js 렌더링
+            renderChart(history, futureTimestamps, predMeans, predMins, predMaxs, lastCandle);
+        }
+
+        function renderChart(history, futureTimestamps, predMeans, predMins, predMaxs, lastCandle) {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            // 과거 1년 전체 데이터(최대 250봉)를 시각화에 표시하여 1년 추세와 예측을 한눈에 조망
+            const displayHistory = history.slice(-250);
+            const labels = [];
+            const histPrices = [];
+            const forecastMeanData = [];
+            const forecastMinData = [];
+            const forecastMaxData = [];
+
+            displayHistory.forEach(c => {
+                labels.push(c.timestamp.split(' ')[0]);
+                histPrices.push(c.close);
+                forecastMeanData.push(null);
+                forecastMinData.push(null);
+                forecastMaxData.push(null);
+            });
+
+            // 연결점 (마지막 과거 포인트에서 예측 곡선이 이어지도록 설정)
+            const lastIdx = labels.length - 1;
+            forecastMeanData[lastIdx] = lastCandle.close;
+            forecastMinData[lastIdx] = lastCandle.close;
+            forecastMaxData[lastIdx] = lastCandle.close;
+
+            // 미래 예측 데이터 추가
+            futureTimestamps.forEach((ft, i) => {
+                labels.push(ft.split(' ')[0] + ' (예측)');
+                histPrices.push(null);
+                forecastMeanData.push(predMeans[i]);
+                forecastMinData.push(predMins[i]);
+                forecastMaxData.push(predMaxs[i]);
+            });
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'KOSPI 200 실제 지수 (1년)',
+                            data: histPrices,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            pointHoverRadius: 4,
+                            fill: true,
+                            tension: 0.15
+                        },
+                        {
+                            label: 'Kronos 예측 평균치',
+                            data: forecastMeanData,
+                            borderColor: '#f97316',
+                            borderWidth: 2.5,
+                            borderDash: [5, 5],
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#f97316',
+                            fill: false,
+                            tension: 0.2
+                        },
+                        {
+                            label: '예측 상한 밴드',
+                            data: forecastMaxData,
+                            borderColor: 'transparent',
+                            pointRadius: 0,
+                            fill: '+1',
+                            backgroundColor: 'rgba(249, 115, 22, 0.2)',
+                            tension: 0.2
+                        },
+                        {
+                            label: '예측 하한 밴드',
+                            data: forecastMinData,
+                            borderColor: 'transparent',
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { size: 13, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.parsed.y !== null) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' pt';
+                                    }
+                                    return null;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                font: { size: 11 },
+                                maxRotation: 45,
+                                autoSkip: true,
+                                maxTicksLimit: 14
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                font: { size: 11 },
+                                callback: function(val) {
+                                    return val.toFixed(1);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function triggerLiveForecast() {
+            const btn = document.getElementById('btn-run-forecast');
+            const pill = document.getElementById('server-status-pill');
+            const endpointInput = document.getElementById('api-endpoint').value.trim();
+
+            if (!endpointInput) {
+                alert('API Server 엔드포인트 URL을 입력해주세요.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Kronos 추론 중...';
+            pill.className = 'status-pill online';
+            pill.innerText = 'Connecting...';
+
+            try {
+                // 1. 최신 네이버 증권 KOSPI 200 데이터 실시간 수집 시도
+                let historyCandles = currentData.history;
+                try {
+                    const naverResp = await fetch('https://m.stock.naver.com/api/index/KPI200/price?page=1&pageSize=60');
+                    if (naverResp.ok) {
+                        const naverData = await naverResp.json();
+                        const sorted = naverData.sort((a, b) => a.localTradedAt.localeCompare(b.localTradedAt));
+                        historyCandles = sorted.map(c => ({
+                            timestamp: c.localTradedAt + ' 15:30:00',
+                            open: parseFloat(c.openPrice.replace(/,/g, '')),
+                            high: parseFloat(c.highPrice.replace(/,/g, '')),
+                            low: parseFloat(c.lowPrice.replace(/,/g, '')),
+                            close: parseFloat(c.closePrice.replace(/,/g, '')),
+                            volume: 100000.0,
+                            amount: 1000000.0
+                        }));
+                    }
+                } catch (fetchErr) {
+                    console.warn('네이버 증권 직접 수집 실패 (기존 로컬 컨텍스트 유지):', fetchErr);
+                }
+
+                // 2. 미래 1개월 (약 22 영업일) 타임스탬프 계산
+                const lastTimestamp = historyCandles[historyCandles.length - 1].timestamp;
+                const lastDate = new Date(lastTimestamp.replace(' ', 'T'));
+                const futureTimestamps = [];
+                let cur = new Date(lastDate);
+                while (futureTimestamps.length < 22) {
+                    cur.setDate(cur.getDate() + 1);
+                    if (cur.getDay() !== 0 && cur.getDay() !== 6) {
+                        const y = cur.getFullYear();
+                        const m = String(cur.getMonth() + 1).padStart(2, '0');
+                        const d = String(cur.getDate()).padStart(2, '0');
+                        futureTimestamps.push(y + '-' + m + '-' + d + ' 15:30:00');
+                    }
+                }
+
+                // 3. Kronos Colab Server /predict 호출 (과거 1년 250봉 컨텍스트 전달)
+                const baseUrl = endpointInput.replace(/\/$/, '');
+                const runs = [];
+
+                for (let i = 0; i < 3; i++) {
+                    const payload = {
+                        history: historyCandles.slice(-250),
+                        future_timestamps: futureTimestamps,
+                        temperature: 0.75,
+                        top_p: 0.9,
+                        sample_count: 3
+                    };
+
+                    const resp = await fetch(baseUrl + '/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!resp.ok) {
+                        throw new Error('서버 오류 (HTTP ' + resp.status + '): ' + resp.statusText);
+                    }
+
+                    const jsonResult = await resp.json();
+                    runs.push(jsonResult.predictions);
+
+                    if (jsonResult.model_size) {
+                        const mSize = jsonResult.model_size.toUpperCase();
+                        let pText = '';
+                        if (mSize === 'MINI') pText = '4.1M';
+                        else if (mSize === 'SMALL') pText = '24.7M';
+                        else if (mSize === 'BASE') pText = '102.3M';
+                        else if (mSize === 'LARGE') pText = '499.2M';
+
+                        const mTitle = 'Kronos-' + jsonResult.model_size.toLowerCase() + (pText ? ' (' + pText + ')' : '');
+                        const metaModelEl = document.getElementById('meta-model-name');
+                        if (metaModelEl) metaModelEl.innerText = mTitle;
+                        const methodModelEl = document.getElementById('methodology-model-name');
+                        if (methodModelEl) methodModelEl.innerText = mTitle;
+                    }
+                }
+
+                currentData = {
+                    updated_at: new Date().toISOString().replace('T', ' ').substring(0, 19) + ' (Live API)',
+                    symbol: 'KPI200',
+                    symbol_name: 'KOSPI 200 Index',
+                    history: historyCandles,
+                    future_timestamps: futureTimestamps,
+                    predictions_runs: runs
+                };
+
+                renderDashboard(currentData);
+                pill.className = 'status-pill online';
+                pill.innerText = 'Live Synced';
+
+            } catch (err) {
+                console.error('실시간 예측 요청 실패:', err);
+                pill.className = 'status-pill error';
+                pill.innerText = 'CORS/API Error';
+                alert('API 서버 직접 호출 실패 (브라우저 CORS 제한 또는 Colab 터널 상태 확인 필요).\n\n오류: ' + err.message + '\n\n기존 내장된 기준 데이터로 대시보드가 정상 유지됩니다.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>⚡ 실시간 예측 재실행</span>';
+            }
+        }
+
+        window.triggerLiveForecast = triggerLiveForecast;
+        window.renderDashboard = renderDashboard;
+
+        // 버튼 클릭 이벤트 바인딩 보장
+        const runBtn = document.getElementById('btn-run-forecast');
+        if (runBtn) {
+            runBtn.onclick = triggerLiveForecast;
+        }
+    </script>
+</body>
+</html>
