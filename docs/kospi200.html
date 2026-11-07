@@ -522,7 +522,7 @@
                         📊 데이터: <strong>KOSPI 200 (과거 1년 일봉, 250봉)</strong>
                     </div>
                     <div class="meta-tag">
-                        🧠 모델: <strong>Kronos-mini (4.1M)</strong>
+                        🧠 모델: <strong id="meta-model-name">Kronos-base (102.3M)</strong>
                     </div>
                 </div>
             </div>
@@ -531,7 +531,7 @@
             <div class="api-status-bar">
                 <div class="endpoint-input-wrap">
                     <label for="api-endpoint">API Server:</label>
-                    <input type="text" id="api-endpoint" class="endpoint-input" value="https://decimal-blocked-rotation-goes.trycloudflare.com" placeholder="https://your-colab-tunnel.trycloudflare.com">
+                    <input type="text" id="api-endpoint" class="endpoint-input" value="https://lbs-evidence-satisfy-published.trycloudflare.com" placeholder="https://your-colab-tunnel.trycloudflare.com">
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span id="server-status-pill" class="status-pill cached">Cached Data</span>
@@ -598,7 +598,7 @@
                 <h3>⚙️ 예측 파이프라인 개요</h3>
                 <ul>
                     <li>
-                        <strong>파운데이션 모델:</strong> <code>Kronos-mini</code> (410만 파라미터) 모델이 과거 캔들스틱 토큰 시퀀스를 조건부 입력으로 받아 미래 K-Line을 자기회귀(Autoregressive) 방식으로 생성합니다.
+                        <strong>파운데이션 모델:</strong> <code id="methodology-model-name">Kronos-base (102.3M)</code> 모델이 과거 캔들스틱 토큰 시퀀스를 조건부 입력으로 받아 미래 K-Line을 자기회귀(Autoregressive) 방식으로 생성합니다.
                     </li>
                     <li>
                         <strong>데이터 컨텍스트:</strong> KOSPI 200 지수의 최근 일별 Open, High, Low, Close, Volume 데이터 30~60봉을 컨텍스트로 전달합니다.
@@ -653,6 +653,41 @@
         let chartInstance = null;
         let currentData = null;
 
+        async function checkServerHealthAndModel(endpoint) {
+            if (!endpoint) return;
+            const baseUrl = endpoint.replace(/\/$/, '');
+            try {
+                const resp = await fetch(baseUrl + '/health');
+                if (resp.ok) {
+                    const info = await resp.json();
+                    if (info.model || info.model_size) {
+                        const size = (info.model_size || 'base').toUpperCase();
+                        let paramText = '';
+                        if (size === 'MINI') paramText = '4.1M';
+                        else if (size === 'SMALL') paramText = '24.7M';
+                        else if (size === 'BASE') paramText = '102.3M';
+                        else if (size === 'LARGE') paramText = '499.2M';
+
+                        const displayTitle = 'Kronos-' + (info.model_size || 'base').toLowerCase() + (paramText ? ' (' + paramText + ')' : '');
+                        
+                        const metaModelEl = document.getElementById('meta-model-name');
+                        if (metaModelEl) metaModelEl.innerText = displayTitle;
+
+                        const methodModelEl = document.getElementById('methodology-model-name');
+                        if (methodModelEl) methodModelEl.innerText = displayTitle;
+
+                        const headerBadge = document.querySelector('header .badge');
+                        if (headerBadge) {
+                            headerBadge.innerHTML = '<span class="pulse-dot"></span> Kronos Live Demo (' + displayTitle + ')';
+                        }
+                        console.log('서버 모델 확인 완료:', displayTitle, info);
+                    }
+                }
+            } catch (err) {
+                console.warn('/health 확인 실패:', err);
+            }
+        }
+
         function initDashboard() {
             try {
                 // 1. URL Query Parameter 파싱 (?url=..., ?api=..., ?server=..., ?endpoint=...)
@@ -678,7 +713,12 @@
                 currentData = JSON.parse(cachedEl.textContent.trim());
                 renderDashboard(currentData);
 
-                // 3. Query parameter로 서버 URL이 전달되었으면 자동으로 실시간 예측 동기화 실행
+                // 3. 서버 /health 엔드포인트 비동기 조회하여 실제 모델 크기 반영
+                if (endpointInput && endpointInput.value) {
+                    checkServerHealthAndModel(endpointInput.value);
+                }
+
+                // 4. Query parameter로 서버 URL이 전달되었으면 자동으로 실시간 예측 동기화 실행
                 if (queryApi && autoRun) {
                     console.log('Query parameter API 서버 감지: 실시간 예측 자동 실행 시작 ->', endpointInput.value);
                     triggerLiveForecast();
@@ -1001,6 +1041,21 @@
 
                     const jsonResult = await resp.json();
                     runs.push(jsonResult.predictions);
+
+                    if (jsonResult.model_size) {
+                        const mSize = jsonResult.model_size.toUpperCase();
+                        let pText = '';
+                        if (mSize === 'MINI') pText = '4.1M';
+                        else if (mSize === 'SMALL') pText = '24.7M';
+                        else if (mSize === 'BASE') pText = '102.3M';
+                        else if (mSize === 'LARGE') pText = '499.2M';
+
+                        const mTitle = 'Kronos-' + jsonResult.model_size.toLowerCase() + (pText ? ' (' + pText + ')' : '');
+                        const metaModelEl = document.getElementById('meta-model-name');
+                        if (metaModelEl) metaModelEl.innerText = mTitle;
+                        const methodModelEl = document.getElementById('methodology-model-name');
+                        if (methodModelEl) methodModelEl.innerText = mTitle;
+                    }
                 }
 
                 currentData = {
