@@ -987,12 +987,7 @@
             } catch (err) {
                 console.error('실시간 예측 요청 실패:', err);
                 pill.className = 'status-pill error';
-                pill.innerText = 'CORS/API Error';
-                alert('API 서버 직접 호출 실패 (브라우저 CORS 제한 또는 Colab 터널 상태 확인 필요).
-
-오류: ' + err.message + '
-
-기존 내장된 기준 데이터로 대시보드가 정상 유지됩니다.');
+                alert('API 서버 직접 호출 실패 (브라우저 CORS 제한 또는 Colab 터널 상태 확인 필요).\n\n오류: ' + err.message + '\n\n기존 내장된 기준 데이터로 대시보드가 정상 유지됩니다.');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<span>⚡ 실시간 예측 재실행</span>';
